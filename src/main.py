@@ -6,6 +6,11 @@ from src.llm.intent_parser import IntentParser
 from src.llm.response_generator import ResponseGenerator
 from src.ranking.reranker import rerank
 
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 app = FastAPI()
 
 movies = pd.read_csv("data/movies_sample.csv")
@@ -22,6 +27,8 @@ response_generator = ResponseGenerator()
 @app.get("/recommend")
 def recommend(query: str):
     prefs = intent_parser.parse(query)
+    logger.info(f"Received query: {query}")
+    logger.info(f"Parsed preferences: {prefs}")
 
     query_embedding = embedding_model.encode([query])
     results = vector_store.search(query_embedding, k=5)
